@@ -53,7 +53,7 @@ WHERE p.ciudad_id_vive = ciudadVive.id;
 -- Listar el nombre de las personas que no tienen ciudad donde trabajan
 SELECT p.nombre AS 'Persona Nombre'
 FROM personas p
-WHERE p.ciudad_id_trabaja IS NULL
+WHERE p.ciudad_id_trabaja IS NULL;
 
 --  El nombre de la persona, la placa de los vehiculos y el vehiculo por donde ha pasado
 SELECT
@@ -124,7 +124,7 @@ GROUP BY persona.nombre, vehiculo.placa;
 -- Listado de las personas con los peajes que ha pasado con el vehiculo  y el
 -- numero de veces que la gente ha pasado por un peaje
 SELECT
-peaje.nombre as 'Nombre Persona',
+peaje.nombre as 'Nombre Peaje',
 COUNT(*) as 'Veces que la gente ha pasado por un peaje'
 FROM
 personas persona,
@@ -141,3 +141,90 @@ WHERE
   AND
   paso.propietario_id = propietario.id
 GROUP BY peaje.nombre;
+
+-- Listado de los vehiculos que han pagado mas de un peaje
+SELECT
+vehiculo.placa
+FROM
+personas persona,
+propietarios propietario,
+vehiculos vehiculo,
+pasos paso,
+peajes peaje
+WHERE
+  persona.id = propietario.persona_id
+  AND
+  propietario.vehiculo_id = vehiculo.id
+  AND
+  paso.peajes_id = peaje.id
+  AND
+  paso.propietario_id = propietario.id
+GROUP BY vehiculo.placa
+HAVING COUNT(*) > 2;
+
+-- Listado con el nombre de la personas y el vehiculo que han pagado mas de un peaje
+SELECT PE.nombre, PAGO_MAS_DE_DOS.placa
+FROM
+vehiculos V,
+propietarios PR,
+personas PE,
+( SELECT
+  vehiculo.placa
+  FROM
+  personas persona,
+  propietarios propietario,
+  vehiculos vehiculo,
+  pasos paso,
+  peajes peaje
+  WHERE
+    persona.id = propietario.persona_id
+    AND
+    propietario.vehiculo_id = vehiculo.id
+    AND
+    paso.peajes_id = peaje.id
+    AND
+    paso.propietario_id = propietario.id
+  GROUP BY vehiculo.placa
+  HAVING COUNT(*) > 2
+) PAGO_MAS_DE_DOS
+WHERE
+  PAGO_MAS_DE_DOS.placa = V.placa
+  AND V.id = PR.vehiculo_id
+  AND PR.persona_id = PE.id;
+
+-- Nombre de la persona que mas a pagado
+SELECT PER.nombre, COUNT(*) conteo
+FROM
+personas PER,
+propietarios PRO,
+vehiculos VEH,
+pasos PAS,
+peajes PEA
+WHERE
+  PER.id = PRO.persona_id
+  AND
+  PRO.vehiculo_id = VEH.id
+  AND
+  PRO.id = PAS.propietario_id
+  AND
+  PAS.peajes_id = PEA.id
+GROUP BY PER.nombre
+HAVING COUNT(*) =
+                ( SELECT COUNT(*) conteo
+                  FROM
+                  personas PER, 
+                  propietarios PRO,
+                  vehiculos VEH,
+                  pasos PAS,
+                  peajes PEA
+                  WHERE
+                    PER.id = PRO.persona_id
+                    AND
+                    PRO.vehiculo_id = VEH.id
+                    AND
+                    PRO.id = PAS.propietario_id
+                    AND
+                    PAS.peajes_id = PEA.id
+                  GROUP BY PER.nombre
+                  ORDER BY 1 DESC
+                  LIMIT 1 )
