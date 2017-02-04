@@ -54,3 +54,90 @@ WHERE p.ciudad_id_vive = ciudadVive.id;
 SELECT p.nombre AS 'Persona Nombre'
 FROM personas p
 WHERE p.ciudad_id_trabaja IS NULL
+
+--  El nombre de la persona, la placa de los vehiculos y el vehiculo por donde ha pasado
+SELECT
+persona.nombre as 'Nombre Persona',
+vehiculo.placa,
+paso.id as 'paso',
+peaje.nombre as 'Nombre Peajes'
+FROM
+personas persona,
+propietarios propietario,
+vehiculos vehiculo,
+pasos paso,
+peajes peaje
+WHERE
+  persona.id = propietario.persona_id
+  AND
+  propietario.vehiculo_id = vehiculo.id
+  AND
+  paso.peajes_id = peaje.id
+  AND
+  paso.propietario_id = propietario.id;
+
+-- Listado de las personas con los peajes que ha pasado con el vehiculo  y el
+-- numero de veces que ha pasado por ese peaje
+SELECT
+persona.nombre as 'Nombre Persona',
+vehiculo.placa,
+peaje.nombre as 'Nombre Peajes',
+COUNT(*) as 'Veces que ha pasado por peaje'
+FROM
+personas persona,
+propietarios propietario,
+vehiculos vehiculo,
+pasos paso,
+peajes peaje
+WHERE
+  persona.id = propietario.persona_id
+  AND
+  propietario.vehiculo_id = vehiculo.id
+  AND
+  paso.peajes_id = peaje.id
+  AND
+  paso.propietario_id = propietario.id
+GROUP BY persona.nombre, vehiculo.placa, peaje.nombre;
+
+-- Listado de las personas con los peajes que ha pasado con el vehiculo  y el
+-- numero de veces que ha pasado un carro por peaje
+SELECT
+persona.nombre as 'Nombre Persona',
+vehiculo.placa,
+COUNT(*) as 'Veces que ha pasado un carro por peaje'
+FROM
+personas persona,
+propietarios propietario,
+vehiculos vehiculo,
+pasos paso,
+peajes peaje
+WHERE
+  persona.id = propietario.persona_id
+  AND
+  propietario.vehiculo_id = vehiculo.id
+  AND
+  paso.peajes_id = peaje.id
+  AND
+  paso.propietario_id = propietario.id
+GROUP BY persona.nombre, vehiculo.placa;
+
+-- Listado de las personas con los peajes que ha pasado con el vehiculo  y el
+-- numero de veces que la gente ha pasado por un peaje
+SELECT
+peaje.nombre as 'Nombre Persona',
+COUNT(*) as 'Veces que la gente ha pasado por un peaje'
+FROM
+personas persona,
+propietarios propietario,
+vehiculos vehiculo,
+pasos paso,
+peajes peaje
+WHERE
+  persona.id = propietario.persona_id
+  AND
+  propietario.vehiculo_id = vehiculo.id
+  AND
+  paso.peajes_id = peaje.id
+  AND
+  paso.propietario_id = propietario.id
+GROUP BY peaje.nombre;
