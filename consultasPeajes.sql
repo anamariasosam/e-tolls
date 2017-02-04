@@ -209,22 +209,36 @@ WHERE
   AND
   PAS.peajes_id = PEA.id
 GROUP BY PER.nombre
-HAVING COUNT(*) =
-                ( SELECT COUNT(*) conteo
-                  FROM
-                  personas PER, 
-                  propietarios PRO,
-                  vehiculos VEH,
-                  pasos PAS,
-                  peajes PEA
-                  WHERE
-                    PER.id = PRO.persona_id
-                    AND
-                    PRO.vehiculo_id = VEH.id
-                    AND
-                    PRO.id = PAS.propietario_id
-                    AND
-                    PAS.peajes_id = PEA.id
-                  GROUP BY PER.nombre
-                  ORDER BY 1 DESC
-                  LIMIT 1 )
+HAVING
+  COUNT(*) =
+      ( SELECT COUNT(*) conteo
+        FROM
+        personas PER,
+        propietarios PRO,
+        vehiculos VEH,
+        pasos PAS,
+        peajes PEA
+        WHERE
+          PER.id = PRO.persona_id
+          AND
+          PRO.vehiculo_id = VEH.id
+          AND
+          PRO.id = PAS.propietario_id
+          AND
+          PAS.peajes_id = PEA.id
+        GROUP BY PER.nombre
+        ORDER BY 1 DESC
+        LIMIT 1 );
+
+-- El valor del peaje dado el rfid
+SELECT categoria.psValor
+FROM
+propietarios propietario,
+vehiculos vehiculo,
+categorias categoria
+WHERE
+  propietario.vehiculo_id = vehiculo.id
+  AND
+  categoria.id = vehiculo.categoria_id
+  AND
+  propietario.rfid = 'AB123';
