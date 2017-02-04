@@ -1,3 +1,4 @@
+-- Procedimiento para insertar en la tabla pasos dado el id del peaje y el rfid
 DELIMITER $$
 DROP PROCEDURE IF EXISTS p_insertar_paso$$
 CREATE
